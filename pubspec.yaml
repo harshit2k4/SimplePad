@@ -10,10 +10,33 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # For state management and navigation
+  get: ^4.6.6
+
+  # For local database storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # For the staggered grid view on the home page
+  flutter_staggered_grid_view: ^0.7.0
+
+  # For finding folders to save audio files
+  path_provider: ^2.1.2
+
+  # For recording voice notes
+  record: ^5.1.0
+
+  # For picking audio files from the file manager
+  file_picker: ^8.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+  # For generating Hive code
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.8
 
 flutter:
   uses-material-design: true
