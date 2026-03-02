@@ -1,6 +1,8 @@
 name: Build Android APK
 
 on:
+  workflow_dispatch:
+  
   push:
     branches: [ main, master ]
   pull_request:
@@ -41,3 +43,4 @@ jobs:
         with:
           name: simple-pad-release-apk
           path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 7
