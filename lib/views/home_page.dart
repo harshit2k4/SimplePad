@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -10,7 +12,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Put the controller into GetX memory
     final NoteController controller = Get.put(NoteController());
 
     return DefaultTabController(
@@ -23,19 +24,15 @@ class HomePage extends StatelessWidget {
           ),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'All Notes'),
+              Tab(text: 'Notes'),
               Tab(text: 'Settings'),
             ],
           ),
         ),
         body: TabBarView(
-          children: [
-            _buildNoteGrid(controller), // Move the existing Obx grid here
-            const SettingsPage(),
-          ],
+          children: [_buildNoteList(controller), const SettingsPage()],
         ),
         floatingActionButton: FloatingActionButton.large(
-          // Expressive FAB
           onPressed: () => Get.to(() => const NoteEditorPage()),
           child: const Icon(Icons.add),
         ),
@@ -43,48 +40,92 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Helper method to keep code modular
-  Widget _buildNoteGrid(NoteController controller) {
-    return Obx(() {
-      if (controller.notes.isEmpty) {
-        return const Center(child: Text('No notes yet.'));
-      }
-      return MasonryGridView.count(
-        crossAxisCount: 2,
-        padding: const EdgeInsets.all(12),
-        itemCount: controller.notes.length,
-        itemBuilder: (context, index) {
-          final note = controller.notes[index];
-          return Card(
-            // Use the note's color or a default surface color
-            color: note.colorValue == 0 ? null : Color(note.colorValue),
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    note.title,
-                    style: Theme.of(context).textTheme.titleLarge,
+  Widget _buildNoteList(NoteController controller) {
+    return Column(
+      children: [
+        // Glassmorphism Search Bar
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: TextField(
+                  onChanged: (value) => controller.filterNotes(value),
+                  decoration: const InputDecoration(
+                    hintText: 'Search notes...',
+                    border: InputBorder.none,
+                    icon: Icon(Icons.search),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    note.content,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
+                ),
               ),
             ),
-          );
-        },
-      );
-    });
+          ),
+        ),
+
+        // The Grid
+        Expanded(
+          child: Obx(() {
+            if (controller.filteredNotes.isEmpty) {
+              return const Center(child: Text('No notes found.'));
+            }
+            return MasonryGridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(12),
+              itemCount: controller.filteredNotes.length,
+              itemBuilder: (context, index) {
+                final note = controller.filteredNotes[index];
+
+                // Readability Fix:
+                // We use opacity so colors are soft in both Light and Dark mode
+                Color noteColor = note.colorValue == 0
+                    ? Theme.of(context).colorScheme.surfaceVariant
+                    : Color(note.colorValue).withOpacity(0.5);
+
+                return Card(
+                  color: noteColor,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: Colors.black12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          note.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          note.content,
+                          style: const TextStyle(fontSize: 14),
+                          maxLines: 6, // Ellipsis fix
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ),
+      ],
+    );
   }
 }
