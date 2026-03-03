@@ -5,6 +5,8 @@ import '../models/note_model.dart';
 class NoteController extends GetxController {
   // This list will hold all our notes
   var notes = <NoteModel>[].obs;
+  // This list will change as the user types in search
+  var filteredNotes = <NoteModel>[].obs;
 
   // This is our Hive box
   late Box<NoteModel> notesBox;
@@ -21,9 +23,27 @@ class NoteController extends GetxController {
   // Function to refresh the list from Hive
   void loadNotes() {
     notes.assignAll(notesBox.values.toList());
+    // Initially, filtered notes are just all notes
+    filteredNotes.assignAll(notes);
   }
 
-  // Function to add a new note
+  // New Search Function
+  void filterNotes(String query) {
+    if (query.isEmpty) {
+      filteredNotes.assignAll(notes);
+    } else {
+      filteredNotes.assignAll(
+        notes
+            .where(
+              (note) =>
+                  note.title.toLowerCase().contains(query.toLowerCase()) ||
+                  note.content.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList(),
+      );
+    }
+  }
+
   void addNote(NoteModel note) {
     notesBox.put(note.id, note);
     loadNotes();
