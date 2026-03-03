@@ -52,6 +52,12 @@ class NoteController extends GetxController {
   // Function to delete a note
   void deleteNote(String id) {
     notesBox.delete(id);
-    loadNotes();
+    loadNotes(); // Refresh the list
+  }
+
+  // Function to update a note
+  void updateNote(NoteModel note) {
+    notesBox.put(note.id, note); // Overwrites the old note with the same ID
+    loadNotes(); // Refresh the list
   }
 }

@@ -83,41 +83,49 @@ class HomePage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final note = controller.filteredNotes[index];
 
-                // Readability Fix:
-                // We use opacity so colors are soft in both Light and Dark mode
                 Color noteColor = note.colorValue == 0
                     ? Theme.of(context).colorScheme.surfaceVariant
                     : Color(note.colorValue).withOpacity(0.5);
 
-                return Card(
-                  color: noteColor,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(color: Colors.black12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          note.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                return GestureDetector(
+                  onTap: () {
+                    // Navigate to editor and pass the selected note
+                    Get.to(() => NoteEditorPage(note: note));
+                  },
+                  onLongPress: () {
+                    // Show a simple delete confirmation
+                    _showDeleteDialog(context, controller, note.id);
+                  },
+                  child: Card(
+                    color: noteColor,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: Colors.black12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            note.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          note.content,
-                          style: const TextStyle(fontSize: 14),
-                          maxLines: 6, // Ellipsis fix
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          Text(
+                            note.content,
+                            style: const TextStyle(fontSize: 14),
+                            maxLines: 6,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -126,6 +134,24 @@ class HomePage extends StatelessWidget {
           }),
         ),
       ],
+    );
+  }
+
+  void _showDeleteDialog(
+    BuildContext context,
+    NoteController controller,
+    String id,
+  ) {
+    Get.defaultDialog(
+      title: "Delete Note",
+      middleText: "Are you sure you want to remove this note?",
+      textConfirm: "Delete",
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        controller.deleteNote(id);
+        Get.back();
+      },
+      textCancel: "Cancel",
     );
   }
 }

@@ -6,7 +6,8 @@ import '../controllers/note_controller.dart';
 import '../models/note_model.dart';
 
 class NoteEditorPage extends StatefulWidget {
-  const NoteEditorPage({super.key});
+  final NoteModel? note;
+  const NoteEditorPage({super.key, this.note});
 
   @override
   State<NoteEditorPage> createState() => _NoteEditorPageState();
@@ -14,11 +15,18 @@ class NoteEditorPage extends StatefulWidget {
 
 class _NoteEditorPageState extends State<NoteEditorPage> {
   final NoteController controller = Get.find<NoteController>();
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
+  late TextEditingController titleController;
+  late TextEditingController contentController;
+  late int selectedColorValue;
 
-  // Default color is transparent (uses system card color)
-  int selectedColorValue = 0;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with existing note data if editing
+    titleController = TextEditingController(text: widget.note?.title ?? '');
+    contentController = TextEditingController(text: widget.note?.content ?? '');
+    selectedColorValue = widget.note?.colorValue ?? 0;
+  }
 
   // Simple list of soft Material 3 colors
   final List<Color> noteColors = [
@@ -38,16 +46,24 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       return;
     }
 
-    final newNote = NoteModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    // Keep the old ID if editing, otherwise create a new one
+    final String noteId =
+        widget.note?.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+
+    final updatedNote = NoteModel(
+      id: noteId,
       title: titleController.text,
       content: contentController.text,
       dateTime: DateTime.now(),
       colorValue: selectedColorValue,
-      audioPaths: [],
+      audioPaths: widget.note?.audioPaths ?? [], // Keep existing recordings
     );
 
-    controller.addNote(newNote);
+    if (widget.note == null) {
+      controller.addNote(updatedNote);
+    } else {
+      controller.updateNote(updatedNote);
+    }
     Get.back();
   }
 
