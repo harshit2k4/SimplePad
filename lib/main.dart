@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:simplepad/models/note_model.dart';
+import 'package:simplepad/views/home_page.dart';
 
 void main() async {
   // This makes sure Flutter is ready before we start Hive
@@ -37,19 +38,7 @@ class SimplePadApp extends StatelessWidget {
         colorSchemeSeed: Colors.deepPurple,
         brightness: Brightness.dark,
       ),
-      home: const PlaceholderHome(),
-    );
-  }
-}
-
-class PlaceholderHome extends StatelessWidget {
-  const PlaceholderHome({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('SimplePad'), centerTitle: true),
-      body: const Center(child: Text('Hive is ready!')),
+      home: HomePage(),
     );
   }
 }
