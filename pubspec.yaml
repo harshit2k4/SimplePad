@@ -29,6 +29,9 @@ dependencies:
   # For picking audio files from the file manager
   file_picker: ^8.0.0
 
+  # For playing audio files
+  audioplayers: ^5.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
