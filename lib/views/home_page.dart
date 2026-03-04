@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:simplepad/models/note_model.dart';
 import 'package:simplepad/views/note_editor_page.dart';
 import 'package:simplepad/views/settings_page.dart';
 import '../controllers/note_controller.dart';
@@ -119,11 +120,32 @@ class HomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            note.content,
+                            getPreviewText(note),
                             style: const TextStyle(fontSize: 14),
                             maxLines: 6,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          if (note.audioPaths.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.mic,
+                                  size: 14,
+                                  // color: Colors.black.withOpacity(0.4),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "${note.audioPaths.length} Audio",
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    // color: Colors.black.withOpacity(0.4),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -153,5 +175,13 @@ class HomePage extends StatelessWidget {
       },
       textCancel: "Cancel",
     );
+  }
+
+  String getPreviewText(NoteModel note) {
+    return note.blocks
+        .where((b) => b['type'] == 'text')
+        .map((b) => b['content'])
+        .join(' ')
+        .trim();
   }
 }
