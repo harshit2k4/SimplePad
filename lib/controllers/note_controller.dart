@@ -11,6 +11,9 @@ class NoteController extends GetxController {
   // This is our Hive box
   late Box<NoteModel> notesBox;
 
+  // Track the current playing file path
+  var currentPlayingPath = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -27,21 +30,29 @@ class NoteController extends GetxController {
     filteredNotes.assignAll(notes);
   }
 
-  // New Search Function
+  // Search Function
   void filterNotes(String query) {
     if (query.isEmpty) {
       filteredNotes.assignAll(notes);
     } else {
+      final lowerQuery = query.toLowerCase();
       filteredNotes.assignAll(
-        notes
-            .where(
-              (note) =>
-                  note.title.toLowerCase().contains(query.toLowerCase()) ||
-                  note.content.toLowerCase().contains(query.toLowerCase()),
-            )
-            .toList(),
+        notes.where((note) {
+          bool titleMatch = note.title.toLowerCase().contains(lowerQuery);
+          // Search through blocks for text matches
+          bool contentMatch = note.blocks.any(
+            (block) =>
+                block['type'] == 'text' &&
+                block['content'].toString().toLowerCase().contains(lowerQuery),
+          );
+          return titleMatch || contentMatch;
+        }).toList(),
       );
     }
+  }
+
+  void stopAllAudio(String path) {
+    currentPlayingPath.value = path;
   }
 
   void addNote(NoteModel note) {

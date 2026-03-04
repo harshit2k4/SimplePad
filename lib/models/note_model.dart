@@ -12,8 +12,10 @@ class NoteModel extends HiveObject {
   @HiveField(1)
   String title;
 
+  // change this to a List of Maps to store different types of content
+  // Example: {'type': 'text', 'content': 'Hello'}, {'type': 'audio', 'content': '/path/to/file'}
   @HiveField(2)
-  String content;
+  List<Map<dynamic, dynamic>> blocks;
 
   @HiveField(3)
   DateTime dateTime;
@@ -28,7 +30,7 @@ class NoteModel extends HiveObject {
   NoteModel({
     required this.id,
     required this.title,
-    required this.content,
+    required this.blocks,
     required this.dateTime,
     required this.colorValue,
     required this.audioPaths,
